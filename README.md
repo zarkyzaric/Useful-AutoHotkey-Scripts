@@ -1,3 +1,5 @@
+Before Using any of these scripts you first need to download [Autohotkey](v2 https://www.autohotkey.com/download/ahk-v2.exe)
+
 # AutoHotkey Scripts
  Scripts for AutoCorrection, Hotkeys, Hotstrings and more
 
