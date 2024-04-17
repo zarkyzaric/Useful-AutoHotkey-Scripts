@@ -28,6 +28,9 @@ Examples: ;!
 ;?
 ;?========================================================================
 ;?========================================================================
+; Right Mouse Button and Scroll Wheel perform same action as Alt + Tab / Alt + Shift + Tab
+RButton & WheelDown::AltTab
+RButton & WheelUp::ShiftAltTab
 
 ;-----------------------------------------------------------------------------------------
 ; Ctrl + Backspace => Deletes last word
