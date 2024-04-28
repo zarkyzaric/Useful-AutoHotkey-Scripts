@@ -2,33 +2,11 @@
 #SingleInstance Force
 
 
-; ščžćđŠČŽĆĐ
-;---------------------
-:*?:\vs::š
-:*?:\vc::č
-:*?:\vz::ž
-:*?:\'c::ć
-:*?:\;c::ć
-:*?:\dj::đ
-:*?:\vS::Š
-:*?:\vC::Č
-:*?:\vZ::Ž
-:*?:\'C::Ć
-:*?:\;C::Ć
-:*?:\Dj::Đ
-
-
 
     ; Often words
 ; Often fast writing mistakes
 ;---------------------
-::its::it's
-::I am::I'm
-:C:Im::I'm
-::I will::I'll
-::Ill::I'll
-::does not::doesn't
-::did not::didn't
+
 ::ws::was
 ::hwo::how
 ::wich::which
@@ -78,6 +56,13 @@
 
 ;Contractions
 ;---------------------
+::its::it's
+::I am::I'm
+:C:Im::I'm 
+::I will::I'll
+::Ill::I'll
+::does not::doesn't
+::did not::didn't
 :*C:He had::He'd
 :*C:he had::he'd
 :*C:He has::He's
@@ -168,8 +153,6 @@
 :*C:you will::you'll
 :*C:You would::You'd
 :*C:you would::you'd
-
-
 ; Hed => He'd  
 :*C:Hed::He'd
 :*C:hed::he'd
@@ -179,7 +162,6 @@
 ; :*C:heill::he'll
 :*C:Hed::He'd
 :*C:hed::he'd
-
 :*C:Iam::I'm
 :*C:iam::I'm
 ; :*C:Ihd::I'd
@@ -189,45 +171,38 @@
 :*C:Ill::I'll
 ; :*C:Iwd::I'd
 ; :*C:iwd::i'd
-
 :*C:Ithd::It'd
 :*C:ithd::it'd
 :*C:Its::It's
 :*C:its::it's
 :*C:Itll::It'll
 :*C:itll::it'll
-
 :*C:Shed::She'd
 :*C:shed::she'd
 :*C:Shes::She's
 :*C:shes::she's
-
 :*C:Thatd::That'd
 :*C:thatd::that'd
 :*C:Thats::That's
 :*C:thats::that's
 :*C:Thatll::That'll
 :*C:thatll::that'll
-
 :*C:Wed::We'd
 :*C:wed::we'd
 :*C:Weve::We've
 :*C:weve::we've
-
 :*C:Whatd::What'd
 :*C:whatd::what'd
 :*C:Whats::What's
 :*C:whats::what's
 :*C:Whatll::What'll
 :*C:whatll::what'll
-
 :*C:Whod::Who'd
 :*C:whod::who'd
 :*C:Whos::Who's
 :*C:whos::who's
 :*C:Wholl::Who'll
 :*C:wholl::who'll
-
 :*C:Youre::You're
 :*C:youre::you're
 :*C:Youd::You'd
@@ -237,21 +212,6 @@
 :*C:Youll::You'll
 :*C:youll::you'll
 
-
-; Clipboard Modifiers
-;---------------------
-; :*:cliplower::{
-;     A_Clipboard := StrLower(A_Clipboard)
-; }
-; :*:clipupper::{
-;     A_Clipboard := StrUpper(A_Clipboard)
-; }
-; :*:cliptitle::{
-    ;     A_Clipboard := StrTitle(A_Clipboard)
-    ; }
-
-        
-        
 ; Short words - Autocorrect
 ::adn::and
 ::teh::the
@@ -263,16 +223,22 @@
 ::haev::have
 ::hvae::have
 ::doe::does
-::owrk::work
-::orw::or
-::si::is
+::owrk::work 
+::owkr::work 
+::okwr::work 
+::okwr::work 
+::wokr::work 
+::orw::or  
+::si::is  
 ::shoud::should
+::shoud::should 
 ::coud::could
 ::woud::would
 ::tihs::this
 ::tkae::take
 ::tae::take
 ::jsut::just
+::jst::just
 ::basc::basic
 ::thsi::this
 ::ths::this
@@ -285,25 +251,23 @@
 ::biuld::build
 ::bulid::build
 ::ahve::have
-::jsut::just
-::sotp::stop
-::stop::stop
-::cos::because
+::sotp::stop   
+::sopt::stop 
+::cuz::because 
 ::becasue::because
 ::becuase::because
 ::aywa::away
-::awy::away
+::awy::away 
 ::bale::able
 ::abel::able
 ::hlep::help
 ::nothig::nothing
 ::nohting::nothing
-::severla::several
+::severla::several 
 ::several::several
 ::abit::a bit
 ::abit::a bit
 
-        
 ;Often mistakes
 ;---------------------
 ::beldner::blender  
@@ -325,7 +289,29 @@
 
 
 
+; Clipboard Modifiers
+;---------------------
+; :*:cliplower::{
+;     A_Clipboard := StrLower(A_Clipboard)
+; }
+; :*:clipupper::{
+;     A_Clipboard := StrUpper(A_Clipboard)
+; }
+; :*:cliptitle::{
+    ;     A_Clipboard := StrTitle(A_Clipboard)
+; }
 
-
-
-
+; ščžćđŠČŽĆĐ
+;---------------------
+:*?:\vs::š
+:*?:\vc::č
+:*?:\vz::ž
+:*?:\'c::ć
+:*?:\;c::ć
+:*?:\dj::đ
+:*?:\vS::Š
+:*?:\vC::Č
+:*?:\vZ::Ž
+:*?:\'C::Ć
+:*?:\;C::Ć
+:*?:\Dj::Đ
