@@ -1,23 +1,94 @@
 #Requires AutoHotkey v2.0 
-#Include %A_ScriptDir%\Paths.ahk
+#Include %A_ScriptDir%\Lib\Paths.ahk
+
 
 ;                  FUNCTIONS:
 
-MultiOpen(appsArray) {
-    numOfApps := appsArray.Length  ; Count of apps in the array
-    if (numOfApps = 0) {
-        return
+; Compares if string matches with one of the array's items
+IsIn(haystack,needles*) {
+    has(needle)=>InStr(haystack,needle)
+    ; if IsObject(needles){
+    for index, needle in needles {
+        if has(needle)
+            return True
     }
-    Loop numOfApps {  ; Corrected Loop syntax
-        App := appsArray[A_Index]  ; Get the current app from the array
-        if (App == "") {
-            continue
+    return False
+
+}
+; Runs Workflows and Apps
+MultiRun(apps*) {
+    for index, app in apps {
+        if (IsObject(app)) {  ; Check if the argument is an array
+            for i, path in app {  ; Loop through the array
+                if (path == "")
+                    continue
+                Run(path)
+                ; Uncomment to debug errors
+                ; MsgBox("Error", "An error occurred while running " . path, 16)
+            }
+        } else {  ; It's a single path string
+            if (app == "")
+                continue
+            Run(app)
+            ; Uncomment to debug errors
+            ; MsgBox("Error", "An error occurred while running " . app, 16)
         }
-        Run(App)
-        ; Uncomment the next line if you want to display an error message
-        ; MsgBox("Error", "An error occurred!", 16)
     }
 }
+;Custom MsgBox 
+Msg(Text := "Empty MsgBox",PositionAndSize := "Autosize xcenter y" (A_ScreenHeight // 3),T := 3)
+{
+    
+    DurationOfAppearance := 15
+
+    Font := "Consolas"
+    FontColor := "ff0ffff"
+    FontSize := 15, 
+
+    BGColor := "000000"
+                
+    Width := 600, Height := 200
+    ;_________________________________________________________________
+    ;_________________________________________________________________
+    GuiOptions := "+AlwaysOnTop -caption Border -SysMenu "
+    FontOptions := "q5"
+
+    myGui := Gui(GuiOptions)
+    
+    myGui.BackColor := BGColor   
+    WinSetTransColor("ffffff", myGui)
+    WinSetTransparent(100, myGui)
+    myGui.SetFont("s" FontSize " " FontOptions " c" FontColor, Font)
+    myGui.Add("Text",, Text) ; "'" 
+    myGui.AddText()
+
+    myGui.Show(PositionAndSize)
+    SetTimer () => myGui.Destroy(), -(T * 1000)
+}
+
+; Passes @param as Command Line parameter
+CMD(Command := "",Dir := "C:\Windows\system32") => Run(A_ComSpec ' /k ' Command, Dir)
+FileGen(CODE:= "", fullFileName := "New.txt"){
+    ;! myb naming it file is going to make a problem, we'll see
+    Separator := InStr(CODE," || ")
+    if !Separator
+        return
+    Content := SubStr(CODE, 1, Separator - 1)
+    fullFileName := SubStr(CODE, Separator + StrLen(Content) + 1)
+    ; MsgBox(Content)
+    ; MsgBox(fullFileName)
+
+    if Content == ""
+        return
+    ; try FileDelete(File_type)
+    FileAppend
+    (
+    Content
+    ), A_ScriptDir "\Lib\Files\" fullFileName
+    Run(A_ScriptDir "\Lib\Files\" fullFileName)
+
+
+    }
 
 
 /*          TIME:            */
@@ -81,6 +152,7 @@ GoThrough(Commands,command,input := ""){
     
     return 0
 }
+
 
 UserInputHook(Options := "L1 T2", EndKeys := "{Enter}", CustomOptions := "-Enter"){
     IH := InputHook(Options,EndKeys), IH.Start(), IH.Wait(), userInput := IH.Input
@@ -177,7 +249,7 @@ class Tool {
      
         g_CrdGet.Show("AutoSize y0 x" A_ScreenWidth / 20 * 13.5)
      }
-    static Clock() {
+    static Clock(T:=3) {
 
         static clock_hwnd
     
@@ -236,26 +308,42 @@ class Tool {
             Hotkey("LButton",Destruction, "On")
         g_Clock.OnEvent("Close", Destruction)
         g_Clock.Show("W350 H320 y" A_ScreenHeight / 5 " x" A_ScreenWidth / 2 - 220)
+        ; MsgBox ProcessGetName(g_Clock.Title)
+        Sleep(T*1000)
+        ; PID := WinGetPID(g_Clock.Title)
+        ; Send("{Escape}")
+        WinKill g_Clock.Title
+        ; ProcessClose PID 
+
     
+    }
+}
+class Open {
+    static VSC(input?, VSCode := VSC) {
+        if IsSet(input){
+            if VSCode != VSC
+                VSCode := VSCodium
+            Run(VSC " " input)   ;() => (Send("{LWin}"),SendIn("vs",0.1),SendIn("{Enter}",0.1),SendIn("{LWin}{Up}"))
+            }
+        else {
+            Run(VSCode)
+        } 
     }
 }
 
-class Open {
-    static VSC(input?) {
-        if IsSet(input)
-            Run(VSC " " input) ;() => (Send("{LWin}"),SendIn("vs",0.1),SendIn("{Enter}",0.1),SendIn("{LWin}{Up}"))
-        else
-            Run(VSC) 
-    }
-    
-}
 class Search {
     
     static Smart(input) {
-        if InStr(input, "http") || InStr(input, "C:\") || (InStr(input,"www.") && InStr(input, ".com"))
-            Run(input)
-        else
+        OnError(Other)
+        ItHas(strings*)=>IsIn(input,strings*)
+        if ItHas(" ") || !ItHas(".")
             Search.Browser(input)
+        else if ItHas(".io","C:\","http",".com")
+            Run(input)
+        Other(exception,mode){
+            Run("https://" input)
+            ; return true
+        }
     }
     static YT(input) => Run("https://www.youtube.com/results?search_query=" . StrReplace(input, A_Space, "+"))
     static Browser(input) => Run("https://duckduckgo.com/?t=ffab&q=" . StrReplace(input, A_Space, "+") . "&atb=v403-1&ia=web")
@@ -287,16 +375,18 @@ class Search {
         return
     }
     static PasteBin(input) => Run("https://pastebin.com/" input)
-    static GPT(input) => (Run("https://chat.openai.com"),SendIn("+{Esc}" input,4),SendIn("{Enter}",2))
+    static GPT(input) => (Run("https://chat.openai.com"),WinWait,WinActivate,SendIn("+{Esc}",3),SendIn(input,1),SendIn("{Enter}",1))
     static GitHub(input) => Run("https://github.com/search?q=" StrReplace(input, A_Space, "+") "&type=repositories")
     static Pinterest(input) => Run("https://www.pinterest.com/search/pins/?q=" StrReplace(input, A_Space, "%20") "&rs=typed")
     static Emoji(input) => Run("https://emojipedia.org/search?q=" StrReplace(input, A_Space, "+"))
     static Translate(input) => Run("https://translate.google.com/?sl=en&tl=sr&text=" input "&op=translate")
+    static Wikipedia(input) => Run("https://en.wikipedia.org/wiki/Special:Search?search=" StrReplace(input,A_Space, "+"))
+    static Maps(input) => Run("https://www.google.com/maps?q=" StrReplace(input,A_Space,"+"))
+    static StackOverflow(input) => Run("https://stackoverflow.com/search?q=" StrReplace(input,A_Space,"+"))
 }
 class Raw {
-    /*
-    */
-   static ahk := "Raw.ahk"
+
+   static ahk := Lib "\Raw.ahk"
    static Run(input) {
         if input == ""
             return
@@ -310,6 +400,7 @@ class Raw {
         #Include My_Commands.ahk`n"
         ),Raw.ahk
 
+        
         if InStr(input, "c="){ ; A_Clipboard := %Variable or a String%
             FileAppend
             (
@@ -317,97 +408,110 @@ class Raw {
             A_Clipboard := " SubStr(input, 3, StrLen(input) - 2) 
             ),Raw.ahk ; SubStr(input, 3, StrLen(input) - 2) ; input.Delete(1,2) 
         }
-        else if !InStr(input, " ") || (InStr(input,"\") && !InStr(input, "`n"))  ; PATHS
-        { 
+        else if InStr(input,"(") || InStr(input,"."){
             FileAppend
             (
-            "Run(" input ")"
-            ),Raw.ahk
+            "" 
+            input
+            ),Raw.ahk ; SubStr(input, 3, StrLen(input) - 2) ; input.Delete(1,2) 
         }
-        ; else if !InStr(input,"'") || !InStr(input,"'")] 
-        else if InStr(input, "`n") || InStr(input,'"') || InStr(input,"'"){
-            Lines := StrSplit(input,"`n")
-            Loop Lines.Length {
-                if Lines[A_Index] == "" || Lines[A_Index] == "`n" || Lines[A_Index] == "`t"  {
-                    Lines.RemoveAt(A_Index)
-                    continue
+        else if !InStr(input, "(") || !InStr(input, " ") || (InStr(input,"\") && !InStr(input, "`n"))  ; PATHS
+            { 
+                FileAppend
+                (
+                "
+                OnError HideError
+                ; i := Integer(`"cause_error`")
+    
+                Run(" input ")
+                
+                HideError(exception, mode) {
+                    MultiRun(" input ")
+                    ; return true
+                    ExitApp()
                 }
+                "
+                ),Raw.ahk
+            }
+        ; else if !InStr(input,"'") || !InStr(input,"'")] 
+        else { ; if InStr(input, "`n") || InStr(input,'"') || InStr(input,"'"){
+            ; Lines := StrSplit(input,"`n")
+            ; for i, line in Lines{
+            ;     if line == "" || line== "`n"{
+            ;         Lines.RemoveAt(i)
+            ;         continue
+            ;     }
                 ; StrReplace(Lines[A_Index], " ", "(",,,1)
-                bracPos := InStr(Lines[A_Index], " ")
-                command := SubStr(Lines[A_Index], 1, bracPos - 1)
-                input := SubStr(Lines[A_Index], bracPos + 1)
-                Lines[A_Index] := command "(" StrReplace(input," ", ",") ")"
+                ; bracPos := InStr(line, " ")
+                ; command := SubStr(Lines[A_Index], 1, bracPos - 1)
+                ; input := SubStr(Lines[A_Index], bracPos + 1)
+                ; Lines[A_Index] := command "(" command ")"
 
                 FileAppend
                 (
                 "`n"
-                Lines[A_Index]
+                input
                 ),Raw.ahk
             }
-        }
-        else {
-            return 0
-        }
+        ; else {
+        ;     return 0
+        ; }
         Run(Raw.ahk)
-        Wait(3)
-        FileDelete(Raw.ahk)
-
         return 1
 
     }
 
     static Terminal() {
-        {
-
-            ;?________________CUSTOMIZE______________________________________________________________
-            ; DurationOfAppearance := 500
-            Font := "Consolas", FontSize := "18", FontColor := "ffffff"
-            BGColor := "001000"
-            Width := 500, Height := 600
-            
-            ;*________________Gui_Object(Appearance)______________________________________________________________________
-            GuiOptions := "AlwaysOnTop -caption Border"
-            FontOptions := "q5"
-            EditBoxOptions := "-E0x200 -VScroll " "W" Width " h" (Height - 5)
-            PositionAndSize := "W" Width "H" Height "y20"
-            myGui := Gui(GuiOptions)
-            myGui.BackColor := BGColor   
-            myGui.SetFont("s" FontSize " " FontOptions " c" FontColor, Font) 
-            global Input := myGui.Add("Edit", "Background" BGColor " x10 " EditBoxOptions) ; Adds an Input(Edit) Box in GUI
-            global WinID := "ahk_id " myGui.Hwnd ; Saving Window handle for destroying GUI
-            myGui.Show(PositionAndSize)
-            
-            ;Input Handling  and Gui's Destruction
-            Destruction(t,shouldContinue := false) { ;for unknown reasons Destruction has to have 2 variables
-                global Input
-                input := Input.Value
-                myGui.Destroy()
-                if shouldContinue = true {
-                    if input == ""
-                        return
-                    else
-                        Raw.Run(input)
-                }
+        ;?________________CUSTOMIZE______________________________________________________________
+        DurationOfAppearance := 500
+        Font := "Consolas", FontSize := "18", FontColor := "ffffff"
+        BGColor := "001000"
+        Width := 500, Height := 600
+        
+        ;*________________Gui_Object(Appearance)______________________________________________________________________
+        GuiOptions := "AlwaysOnTop -caption Border"
+        FontOptions := "q5"
+        EditBoxOptions := "-E0x200 -VScroll " "W" Width " h" (Height - 5)
+        PositionAndSize := "W" Width "H" Height "y20"
+        myGui := Gui(GuiOptions)
+        myGui.BackColor := BGColor   
+        myGui.SetFont("s" FontSize " " FontOptions " c" FontColor, Font) 
+        global Input := myGui.Add("Edit", "Background" BGColor " x10 " EditBoxOptions) ; Adds an Input(Edit) Box in GUI
+        global WinID := "ahk_id " myGui.Hwnd ; Saving Window handle for destroying GUI
+        myGui.Show(PositionAndSize)
+        
+        ;Input Handling  and Gui's Destruction
+        Destruction(t,shouldContinue := false) { ;for unknown reasons Destruction has to have 2 variables
+            global Input
+            input := Input.Value
+            myGui.Destroy()
+            if shouldContinue = true {
+                if input == ""
+                    return
+                else
+                    Raw.Run(input)
             }
+        }
 
-            HotIfWinExist(WinID) 
-                Hotkey("Enter",Send_Stroke.Bind(,"{NumpadEnd}{Enter}"),"On")
-                Hotkey("+Enter",Destruction.Bind(,True),"On")
-                Hotkey("^vkE2",Destruction.Bind(,True),"On")
-                Hotkey("Escape",Destruction,"On")
-                Hotkey("^w",Destruction,"On")
-                
-                ; Hotkey("RControl",Destruction,"On")
-                ; Hotkey("LButton",Destruction,"On")
-                ; Hotkey("NumpadEnter",Destruction.Bind(,True),"On")
-            ; SetTimer () => myGui.Destroy(), -(DurationOfAppearance * 1000)
-            }
+
+        HotIfWinExist(WinID) 
+            Hotkey("Enter",Send_Stroke.Bind(,"{NumpadEnd}{Enter}"),"On")
+            Hotkey("+Enter",Destruction.Bind(,True),"On")
+            Hotkey("^vkE2",Destruction.Bind(,True),"On")
+            Hotkey("Escape",Destruction,"On")
+            Hotkey("^w",Destruction,"On")
+            
+            ; Hotkey("RControl",Destruction,"On")
+            ; Hotkey("LButton",Destruction,"On")
+            ; Hotkey("NumpadEnter",Destruction.Bind(,True),"On")
+        SetTimer () => myGui.Destroy(), -(DurationOfAppearance * 1000)
+
     }
 }
 
 Toggle(this){
     static Toggles := Map(
-    "taskbar",  Batch '\Toggle_Hide_Taskbar.exe',
+    "taskbar",  Automation '\Toggle_Hide_Taskbar.exe',
     
     )
     GoThrough(Toggles,this)
@@ -424,7 +528,7 @@ class Type {
 class Song {
     static Similar(input) => Run("https://www.chosic.com/playlist-generator/")
 }
-class Image {
+class Photo {
     static Convert(input) => Run("https://convertio.co/" input)
     static RemoveBG() =>((Run("https://www.remove.bg/"),SendIn("^v",4)))
     static Dict := Map(
@@ -449,12 +553,13 @@ class Settings {
 class OS {
     static ShutdownIn(X,T) => (Sleep(T*1000),Shutdown(X),ExitApp())
 
-    static Shutdown(T) => OS.ShutdownIn(1,T)
-    static Logoff(T) => OS.ShutdownIn(0,T)
-    static Restart(T) => OS.ShutdownIn(2,T)
-    static ForceShutdown(T) => OS.ShutdownIn(4,T)
-    static ForceRestart(T) => OS.ShutdownIn(6,T)
-    ; static RIP(T) => OS.ShutdownIn(8,T) ; use on your own responsability
+    static Shutdown(T := 1) => OS.ShutdownIn(1,T)
+    static Sleep(T := 1) => (Sleep(T*1000),SendMessage(0x112, 0xF170, 2,, "Program Manager"))
+    static Logoff(T := 1) => OS.ShutdownIn(0,T)
+    static Restart(T := 1) => OS.ShutdownIn(2,T)
+    static ForceShutdown(T := 1) => OS.ShutdownIn(4,T)
+    static ForceRestart(T := 1) => OS.ShutdownIn(6,T)
+    ; static RIP(T := 1) => OS.ShutdownIn(8,T) ; use on your own responsability
 }
 class PowerShell {
     static Path := "C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe"
@@ -462,6 +567,7 @@ class PowerShell {
     static AppsUseLightTheme(N) => PowerShell.Run('"New-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name AppsUseLightTheme -Value "' N '" -Type Dword -Force"')
     static SystemUsesLightTheme(N) => PowerShell.Run('"New-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name SystemUsesLightTheme -Value "' N '" -Type Dword -Force"')
     static SetBrightness(P) => PowerShell.Run('"(Get-WmiObject -Namespace root/WMI -Class WmiMonitorBrightnessMethods).WmiSetBrightness(1,"' P '")"')
+    static ScreenSaver() => PowerShell.Run('-command "& (Get-ItemProperty ‘HKCU:Control Panel\Desktop’).{SCRNSAVE.EXE}"')
 }   
 
 class Get {
@@ -528,7 +634,7 @@ class Mp3 {
       6 ActivateTab
       7 SetActiveAlt
 */
-HideFromTaskbar(T){
+HideFromTaskbar(T := 3){
     IID_ITaskbarList  := "{56FDF342-FD6D-11d0-958A-006097C9A090}"
     CLSID_TaskbarList := "{56FDF344-FD6D-11d0-958A-006097C9A090}"
     

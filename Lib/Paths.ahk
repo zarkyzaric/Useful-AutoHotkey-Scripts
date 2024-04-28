@@ -1,7 +1,7 @@
 
 #Requires AutoHotkey v2.0
 Help := "https://www.autohotkey.com/docs/v2/FAQ.htm"
-CMD := "C:\Windows\system32\cmd.exe"
+
 Class Instagram {
     static COM := "https://www.instagram.com"
     static URL := "https://www.instagram.com"
@@ -12,6 +12,7 @@ class Google {
     static Maps := "https://www.google.com/maps"
     static Translate := "https://translate.google.com/"
     static Gmail := "https://mail.google.com/mail/u/0/#inbox"
+    static YouTube := "www.youtube.com"
     static Mail(N := "0") => Run("https://mail.google.com/mail/u/" N "/#inbox")
 }
 A_User := "C:\Users\" A_UserName
@@ -42,51 +43,23 @@ class C {
 }
 
 ; Main Directories
-Lib := A_ScriptDir "\Lib"
-Batch := A_ScriptDir "\Lib\Batch"
-Singletons := A_ScriptDir "\Lib\Singletons"
-Data_Types := A_ScriptDir "\Lib\Data_Types"
-
 
 
 VSC := User.AppData "\Local\Programs\Microsoft VS Code\Code.exe"
-
-
-
-; class My {
-;     static Documents := A_MyDocuments
-;     static Docs := A_MyDocuments
-;     static Videos := A_User "\Videos"
-;     static Music := A_User "\Music"
-;     static Pictures := A_User "\Pictures"
-;     static Downloads := A_User "\Downloads"
-;     static Desktop := A_Desktop
-;     static Startup :=  A_Startup
-;     static StartMenu := A_StartMenu
-;     static Programs := A_Programs
-;     ; class AppData {
-;         ;     static this := A_User "\AppData"
-;         ;     static Local := AppData.this "\Local"
-;         ; }
-;         static AppData := A_User "\AppData"
-; }
-
+VSCodium := "C:\Program Files\VSCodium\VSCodium.exe"
 
 
 ; Class Default {
-;     ; static Browser := 
-; }
+    ;     ; static Browser := 
+    ; }
 ;? _______________RANDOM___________________________________________________________________
-
-
-
 A_WindowsTools := "shell:::{D20EA4E1-3957-11D2-A40B-0C5020524153}"
 A_ThisPC := "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
 A_RecycleBin := "shell:::{645FF040-5081-101B-9F08-00AA002F954E}"
 A_ControlPanelAll := "shell:::{21EC2020-3AEA-1069-A2DD-08002B30309D}" 
 A_DateAndTime := "shell:::{E2E7934B-DCE5-43C4-9576-7FE4F75E7480}"
-A_MouseProperties := '::{6C8EEC18-8D75-41B2-A177-8831D59D2D50}'
-A_TextToSpeech := '::{D17D1D6D-CC3F-4815-8FE3-607E7D5D10B3}'
+A_MouseProperties := 'shell:::{6C8EEC18-8D75-41B2-A177-8831D59D2D50}'
+A_TextToSpeech := 'shell:::{D17D1D6D-CC3F-4815-8FE3-607E7D5D10B3}'
 A_Applications := "shell:::{4234D49B-0245-4DF3-B780-3893943456E1}"
 A_Run := "shell:::{2559A1F3-21D7-11D4-BDAF-00C04F60B9F0}"
 A_DefaultApps := "shell:::{2559A1F7-21D7-11D4-BDAF-00C04F60B9F0}"
@@ -103,3 +76,25 @@ A_AllTasks_GodMode := "shell:::{ED7BA470-8E54-465E-825C-99712043E01C}"
 A_Firewall := "shell:::{4026492F-2F69-46B8-B9BF-5654FC07E423}"
 A_WindowsSearch := "shell:::{2559A1F8-21D7-11D4-BDAF-00C04F60B9F0}"
 A_FolderOptions := "shell:::{6DFD7C5C-2451-11D3-A299-00C04F8EF6AF}"
+Terminal := A_ScriptDir "\Terminal.ahk"
+Lib := A_ScriptDir "\Lib"
+Executables := Lib "\Executables"
+Automation := Lib "\Automation"
+Singletons := Lib "\Singletons"
+Setup_Requirements := Lib "\Setup_Requirements"
+
+;IMI PATHS
+class KURS {
+    static URL := "https://imi.pmf.kg.ac.rs"
+    static OGLASNA := KURS.URL "/oglasna-tabla"
+    static ID := KURS.URL "/moodle/course/view.php?id="
+    static RASP_KLK := "https://imi.pmf.kg.ac.rs/pub/2cb8552c12d0b06588bf738c975988a0_03272024_010554/inf_raspored_kolokvijuma_2023-24_letnji_v2.pdf"
+    static RASP_ISP := "https://imi.pmf.kg.ac.rs/pub/af3b4da1bb95aacba0a68ae081aad307_01292024_111643/inf_raspored_ispita_2023-24_jun-sep.pdf"
+    static SKRIPTE := KURS.ID "96"
+    static PIP3 := KURS.ID "467"
+    static SPA1 := KURS.ID "12"
+    static MAT2 := KURS.ID "490"
+    static ARH := KURS.ID "395"
+    static RS := KURS.ID "35"
+    static SA := KURS.ID "396"
+}
