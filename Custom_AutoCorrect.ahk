@@ -14,6 +14,7 @@
 ::oyu::you
 ::yuo::you
 ::aer::are
+::adn::and
 ::eigth::eight
 ::comander::commander
 ::coudl::could
@@ -301,17 +302,3 @@
     ;     A_Clipboard := StrTitle(A_Clipboard)
 ; }
 
-; ščžćđŠČŽĆĐ
-;---------------------
-:*?:\vs::š
-:*?:\vc::č
-:*?:\vz::ž
-:*?:\'c::ć
-:*?:\;c::ć
-:*?:\dj::đ
-:*?:\vS::Š
-:*?:\vC::Č
-:*?:\vZ::Ž
-:*?:\'C::Ć
-:*?:\;C::Ć
-:*?:\Dj::Đ
